@@ -84,10 +84,10 @@ canvas.addEventListener('mouseup', () => { mouse.held = false; });
 
 // Touch buttons (logical coords)
 const TB = {
-  left:  { x:20,      y:LH-130, w:70, h:65, label:'◀' },
-  right: { x:100,     y:LH-130, w:70, h:65, label:'▶' },
-  jump:  { x:LW-100,  y:LH-130, w:80, h:65, label:'JUMP' },
-  fire:  { x:LW-190,  y:LH-130, w:80, h:65, label:'FIRE' },
+  left:  { x:20,      y:LH-65, w:70, h:55, label:'◀' },
+  right: { x:100,     y:LH-65, w:70, h:55, label:'▶' },
+  jump:  { x:LW-100,  y:LH-65, w:80, h:55, label:'JUMP' },
+  fire:  { x:LW-190,  y:LH-65, w:80, h:55, label:'FIRE' },
 };
 const activeTouches = new Map();
 
@@ -339,8 +339,10 @@ function initLevel(lvlIdx) {
   goal.y = L.goalY;
   goal.anim = 0;
 
-  cam.x = 0; cam.y = 0;
+  cam.x = clamp(player.x + player.w/2 - LW/2, 0, L.worldW - LW);
+  cam.y = clamp(player.y + player.h/2 - LH/2, 0, L.worldH - LH);
   completeTimer = 0;
+  jumpJustPressed = false;
   state = 'playing';
 }
 
@@ -409,7 +411,7 @@ function update() {
           player.y + player.h >= pl.y) {
         if (pl.bouncy) {
           // Fixed bounce: launch upward
-          player.vy = -(L.jumpStr * (1.4 + pl.bm));
+          player.vy = -(L.jumpStr * 1.5);
           player.jumpCount = 0;
           spawnParts(player.x+player.w/2, pl.y, '#FF9800', 10);
         } else {
@@ -423,7 +425,7 @@ function update() {
       // Hit ceiling
       else if (player.vy < 0 &&
                player.y <= pl.y + pl.h &&
-               player.y + player.vy > pl.y + pl.h) {
+               player.y - player.vy > pl.y + pl.h) {
         player.y = pl.y + pl.h;
         player.vy = 0;
       }
